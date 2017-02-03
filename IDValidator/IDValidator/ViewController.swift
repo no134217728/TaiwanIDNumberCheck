@@ -23,7 +23,13 @@ class ViewController: UIViewController {
     }
     
     @IBAction func btnCheckClick(_ sender: Any) {
-        if isValidateIDNumber(idNumber: txtInput.text!) {
+//        if isValidateIDNumber(idNumber: txtInput.text!) {
+//            lblResult.text = "正確"
+//        } else {
+//            lblResult.text = "不正確"
+//        }
+        
+        if nicksIsValidateIDNumber(ID: txtInput.text!) {
             lblResult.text = "正確"
         } else {
             lblResult.text = "不正確"
@@ -37,6 +43,38 @@ class ViewController: UIViewController {
         return idTest.evaluate(with: strID)
     }
     
+    
+    // 進階 Map 版
+    func nicksIsValidateIDNumber(ID:String)->Bool{
+        /// 過不了正則驗證就一定不是正確的身分證字號
+        guard NSPredicate(format: "SELF MATCHES %@","^[A-Za-z]{1}[1-2]{1}[0-9]{8}$").evaluate(with: ID) else {
+            return false
+        }
+        
+        /// 英文比對
+        let dicFurIDNumber = ["A":"10","B":"11","C":"12","D":"13","E":"14","F":"15","G":"16","H":"17","I":"34","J":"18","K":"19","L":"20","M":"21","N":"22","O":"35","P":"23","Q":"24","R":"25","S":"26","T":"27","U":"28","V":"29","W":"32","X":"30","Y":"31","Z":"33"]
+        
+        /// 取得第一個字(英文)換得數字文字
+        let n00 = dicFurIDNumber["\(ID.characters.first!)".uppercased()]!
+        /// 把換到的數字文字加上原本的數字文字
+        let nn = n00 + ID.substring(from: ID.index(after: ID.startIndex))
+        
+        var ans = 0
+        
+        /// 將數字陣列每個字都轉成Int然後根據所在位置乘以該乘的數字 加進 ans
+        nn.characters.map{Int("\($0)")!}.enumerated().forEach{
+            switch $0.offset{
+            case 1...8 :
+                ans += $0.element * (10 - $0.offset)
+            default :
+                ans += $0.element
+            }
+        }
+        /// 確認 ans 除以 10 是否為0 ， 若為0 就是正確的
+        return ans % 10 == 0
+    }
+    
+    // 入門版
     func isValidateIDNumber(idNumber: String) -> Bool {
         if validateID(strID: idNumber) { // 先確認格式
             let N00: String
