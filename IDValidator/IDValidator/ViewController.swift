@@ -18,7 +18,7 @@ class ViewController: UIViewController {
     
     private func isValidateIDNumberEnu(idNumber: String) -> Bool {
         let pred = NSPredicate(format:"SELF MATCHES %@", "[A-Za-z][1,2][0-9]{8}")
-        if pred.evaluate(with: idNumber) == false { return false }
+        guard pred.evaluate(with: idNumber) else { return false }
             
         let uppercasedSource = idNumber.uppercased()
         let cityAlphabets: [String: Int] = [
@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         
         var ints: [Int] = []
         ints.append(cityNumber % 10)
-        ints.append(contentsOf: uppercasedSource.compactMap{ Int(String($0)) })
+        ints.append(contentsOf: uppercasedSource.compactMap { Int(String($0)) })
         
         guard let last = ints.last else { return false }
         let initialNumber = cityNumber / 10 + last
